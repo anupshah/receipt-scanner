@@ -39,7 +39,7 @@
 
     & .app-header__inner {
       display: flex;
-      align-items: center;
+      align-items: baseline;
       gap: var(--sp-3);
       flex: 1;
       min-width: 0;
@@ -49,7 +49,6 @@
   .app-logo {
     font-size: 1.5rem;
     line-height: 1;
-    flex-shrink: 0;
   }
 
   .app-title {
