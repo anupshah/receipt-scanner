@@ -1,0 +1,144 @@
+@layer components {
+
+  /* ── Receipt Form ───────────────────────────────────────── */
+  .receipt-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-4) var(--sp-5);
+    padding: var(--sp-6);
+    background: var(--surface-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-1);
+
+    &.field-group--full {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .field-label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    user-select: none;
+  }
+
+  .field-input {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    transition:
+      border-color var(--dur-fast),
+      box-shadow var(--dur-fast),
+      background var(--dur-fast);
+    width: 100%;
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+
+    &:hover {
+      border-color: var(--mid-2);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+      background: var(--surface-card);
+    }
+
+    &.field-input--number {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      padding-left: var(--sp-8); /* room for prefix */
+    }
+  }
+
+  .field-input-prefix {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .field-prefix {
+      position: absolute;
+      left: var(--sp-3);
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      pointer-events: none;
+      z-index: 1;
+    }
+  }
+
+  .field-select {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-page);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: border-color var(--dur-fast);
+    width: 100%;
+    appearance: auto;
+
+    &:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+    }
+  }
+
+  .field-hint {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    line-height: var(--leading-normal);
+  }
+
+  /* ── Confidence badge ───────────────────────────────────── */
+  .confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    font-family: var(--font-mono);
+    transition: background var(--dur-base), color var(--dur-base);
+
+    &[data-confidence="high"] {
+      background: color-mix(in srgb, var(--success) 15%, transparent);
+      color: var(--success);
+    }
+
+    &[data-confidence="medium"] {
+      background: color-mix(in srgb, var(--warn) 15%, transparent);
+      color: var(--warn);
+    }
+
+    &[data-confidence="low"] {
+      background: color-mix(in srgb, var(--error) 15%, transparent);
+      color: var(--error);
+    }
+  }
+}

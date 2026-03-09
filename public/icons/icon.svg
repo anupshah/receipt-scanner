@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100">
+  <g transform="translate(15, 17) scale(1.1)" stroke="hsl(162 60% 38%)" stroke-linejoin="round" stroke-linecap="round" fill="none">
+    <!-- Receipt body — white fill so it reads as paper -->
+    <path d="M14 2H50V53L47 58L44 53L41 58L38 53L35 58L32 53L29 58L26 53L23 58L20 53L17 58L14 53Z"
+          fill="white" stroke-width="2.5"/>
+    <!-- Item lines -->
+    <line x1="20" y1="14" x2="44" y2="14" stroke-width="2"/>
+    <line x1="20" y1="22" x2="44" y2="22" stroke-width="2"/>
+    <line x1="20" y1="30" x2="36" y2="30" stroke-width="2"/>
+    <!-- Total line (bolder) -->
+    <line x1="20" y1="41" x2="44" y2="41" stroke-width="2.5"/>
+  </g>
+</svg>

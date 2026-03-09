@@ -1,0 +1,138 @@
+@layer components {
+
+  .examples-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+    padding: var(--sp-4) 0 0;
+    text-align: center;
+  }
+
+  .examples-title {
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    font-size: var(--text-xs);
+  }
+
+  .examples-desc {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    max-width: 40ch;
+  }
+
+  .examples-grid {
+    display: flex;
+    gap: var(--sp-4);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .example-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-4) var(--sp-5);
+    min-width: 140px;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    cursor: grab;
+    transition:
+      border-color var(--dur-base),
+      box-shadow var(--dur-base),
+      transform var(--dur-fast) var(--ease-out);
+
+    &:hover {
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      cursor: grabbing;
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+    }
+
+    &[aria-busy="true"] {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+  }
+
+  .example-card__icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .example-card__label {
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .example-card__meta {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+
+  .howto-list {
+    padding: var(--sp-4) var(--sp-4) var(--sp-2) calc(var(--sp-4) + 1.5em);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.5;
+
+    & strong {
+      color: var(--text-primary);
+    }
+  }
+
+  /* Details wrapper — no default marker */
+  .examples-details {
+    width: 100%;
+  }
+
+  /* Summary styled as the former divider */
+  .examples-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    width: 100%;
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+  }
+}

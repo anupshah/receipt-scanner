@@ -1,0 +1,38 @@
+/* ============================================================
+   RECEIPT SCANNER — CSS entry point
+   Modern CSS: cascade layers, design tokens, nesting,
+   auto dark/light via prefers-color-scheme, no JS theming needed.
+   ============================================================ */
+
+/* All @imports must precede other statements — Google Fonts first */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import './reset.css';
+@import './tokens.css';
+@import './base.css';
+@import './layout.css';
+@import './components/header.css';
+@import './components/buttons.css';
+@import './components/dropzone.css';
+@import './components/status.css';
+@import './components/form.css';
+@import './components/results.css';
+@import './components/toast.css';
+@import './components/examples.css';
+@import './components/footer.css';
+@import './utilities.css';
+
+/* ── Layer order (low → high specificity) ──────────────────── */
+/* The import order above sets cascade priority; this declaration
+   documents the intended order and future-proofs against additions. */
+@layer reset, tokens, base, layout, components, utilities;
+
+/* ── Reduced motion — global override ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

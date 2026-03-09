@@ -1,0 +1,19 @@
+@layer layout {
+
+  .app-shell {
+    display: grid;
+    grid-template-rows: var(--header-h) 1fr auto;
+    min-height: 100dvh;
+    min-height: 100vh; /* fallback */
+  }
+
+  .app-main {
+    width: 100%;
+    max-width: var(--max-content);
+    margin-inline: auto;
+    padding: var(--sp-6) var(--sp-4) var(--sp-12);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+}

@@ -1,0 +1,50 @@
+@layer base {
+
+  html {
+    font-family: var(--font-body);
+    font-size: 106%;
+    color: var(--text-primary);
+    background: var(--surface-page);
+    line-height: var(--leading-normal);
+    scroll-behavior: smooth;
+    accent-color: var(--accent);
+  }
+
+  @media (min-width: 480px) {
+    html {
+      font-size: 100%;
+    }
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+  }
+
+  a {
+    color: var(--accent);
+
+    &:hover {
+      text-decoration: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--border-focus);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+  }
+
+  /* Global focus ring */
+  :focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove focus ring for mouse users */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
