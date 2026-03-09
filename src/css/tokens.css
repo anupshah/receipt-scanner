@@ -43,7 +43,7 @@
     --shadow-lg:  0 12px 32px hsl(220 20% 10% / 0.14);
 
     /* ── Typography ─────────────────────────────────────────── */
-    --font-body:    'DM Sans', 'Helvetica Neue', sans-serif;
+    --font-body:    'Inter', 'Helvetica Neue', sans-serif;
     --font-mono:    'JetBrains Mono', 'Fira Mono', 'Courier New', monospace;
     --font-display: var(--font-body);
 

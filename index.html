@@ -42,12 +42,53 @@
         >
           ⬇ Install
         </button>
-        <span
+        <button
           class="history-pill"
           id="history-count"
+          popovertarget="history-popover"
           aria-label="0 receipts saved"
-          title="Saved receipts this session"
-        >0</span>
+        >
+          <span class="history-pill__icon" aria-hidden="true">🧾</span>
+          <span class="history-pill__count">0</span>
+        </button>
+      </div>
+
+      <!-- ── History popover dropdown ──────────────────────── -->
+      <div id="history-popover" class="history-popover" popover="auto">
+        <p class="history-popover__status" id="history-popover-status">
+          No receipts saved yet.
+        </p>
+        <p class="history-popover__hint" id="history-popover-hint">
+          Scan a receipt, review the fields, then hit <strong>Save Receipt</strong> to queue it here.
+          When you're done, download everything as a single CSV.
+        </p>
+        <table class="history-popover__table" id="history-popover-table" hidden aria-label="Saved receipts summary">
+          <thead>
+            <tr>
+              <th scope="col">Vendor</th>
+              <th scope="col" class="history-popover__amount text-end">Total</th>
+            </tr>
+          </thead>
+          <tbody id="history-popover-tbody"></tbody>
+          <tfoot id="history-popover-tfoot">
+            <tr>
+              <th scope="row">Total</th>
+              <td class="history-popover__amount text-end" id="history-popover-total"></td>
+            </tr>
+          </tfoot>
+        </table>
+        <menu class="history-popover__actions" id="history-popover-actions" hidden>
+          <li>
+            <button id="popover-download-btn" class="btn btn--primary btn--small" type="button">
+              Download CSV
+            </button>
+          </li>
+          <li>
+            <button id="popover-clear-btn" class="btn btn--ghost btn--small" type="button">
+              Clear all
+            </button>
+          </li>
+        </menu>
       </div>
     </header>
 
@@ -107,9 +148,9 @@
         <ol class="howto-list">
           <li><strong>Scan</strong> — drop a receipt, click "Scan Receipt", or try an example below.</li>
           <li><strong>Review</strong> — check the extracted fields and correct anything the scanner missed.</li>
-          <li><strong>Save</strong> — click "Save Receipt" to queue it. The counter top-right tracks your total.</li>
+          <li><strong>Save</strong> — click "Save Receipt" to queue it. The 🧾 counter top-right tracks your total.</li>
           <li><strong>Repeat</strong> — scan your next receipt; each save adds to the queue.</li>
-          <li><strong>Export</strong> — "Download CSV" exports all saved receipts at once, ready for your accounts.</li>
+          <li><strong>Export</strong> — tap the 🧾 counter or the "Download CSV" button to export all saved receipts at once.</li>
         </ol>
       </details>
 

@@ -1,4 +1,8 @@
 @layer utilities {
+  .text-end {
+    text-align: end;
+  }
+
   .sr-only {
     position: absolute;
     width: 1px;

@@ -89,8 +89,7 @@ Before OCR, images are pre-processed in a canvas: rescaled to at least 1500 px w
 
 - **OCR quality** is the main constraint. Tesseract.js performs well on flat, well-lit photos of printed receipts. It degrades on: dark/blurry photos, skewed angles, thermal paper receipts with low contrast, and anything handwritten.
 - **Parser accuracy** varies by retailer. Large supermarkets and chains have consistent receipt formats; independent traders less so.
-- **No history.** Saved receipts exist only for the current browser session. Closing the tab loses them. This is intentional — persisting financial data in `localStorage` without encryption is not appropriate. Use the CSV download to preserve data.
-- **Save = batch export queue, not a history browser.** The Save button appends the current receipt to an in-session list and increments the counter in the top-right. There is no way to navigate back to a previously saved receipt within the app. The payoff comes at the end: the Download CSV button exports all saved receipts as a single multi-row file. Usability is not the best here. A future improvement would make the counter clickable to show a summary list of queued receipts.
+- **Browser-local storage only.** Saved receipts are persisted in `localStorage` so they survive page refreshes and accidental tab closures, but there is no server or cloud sync — clearing browser data or using a different device starts fresh.
 - **PDF support** — machine-generated PDFs (Amazon invoices, retailer PDFs, etc.) have their text extracted directly without OCR, which is faster and more accurate. Scanned PDFs fall back to rendering page 1 to a canvas and passing it through Tesseract. Only the first page is processed in either case; multi-page receipts are not fully supported. SVG files are not accepted.
 - **Not for VAT returns.** This tool captures and exports data; it does not calculate or file anything.
 

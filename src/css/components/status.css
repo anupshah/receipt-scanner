@@ -1,5 +1,4 @@
 @layer components {
-
   /* ── OCR Status ─────────────────────────────────────────── */
   .ocr-status {
     display: flex;
@@ -52,7 +51,6 @@
     overflow: hidden;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border);
-    max-height: 280px;
   }
 
   .receipt-preview {

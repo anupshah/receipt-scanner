@@ -1,5 +1,4 @@
 @layer base {
-
   html {
     font-family: var(--font-body);
     font-size: 106%;
@@ -16,7 +15,9 @@
     }
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
     line-height: var(--leading-tight);
     color: var(--text-primary);
@@ -34,6 +35,12 @@
       outline-offset: 3px;
       border-radius: var(--radius-sm);
     }
+  }
+
+  /* Tabular figures in table cells — even digit spacing for numeric columns. */
+  td,
+  th {
+    font-variant-numeric: tabular-nums;
   }
 
   /* Global focus ring */

@@ -26,8 +26,9 @@ image/PDF file → file-input.ts → pipeline.ts → ocr.ts → parser.ts → ui
 form → export-actions.ts → receipt-formatters.ts → clipboard / download
 ```
 
-No state management layer. DOM is the state for the form fields. `main.ts` wires
-event listeners; everything else is pure functions or simple class-free modules.
+No state management layer. DOM is the state for the form fields; saved receipt
+history is persisted in `localStorage`. `main.ts` wires event listeners;
+everything else is pure functions or simple class-free modules.
 
 ## Key files
 
@@ -39,7 +40,7 @@ event listeners; everything else is pure functions or simple class-free modules.
 | `src/pdf.ts`                | PDF handling — text extraction for machine-generated PDFs, raster conversion for scanned PDFs |
 | `src/pipeline.ts`           | Async scan orchestration — file → OCR → parse → form                                          |
 | `src/file-input.ts`         | File selection, drag-and-drop, and keyboard access handling                                   |
-| `src/export-actions.ts`     | Save, copy, and download button wiring; in-session receipt history                            |
+| `src/export-actions.ts`     | Save, copy, download wiring; receipt history with localStorage persistence                    |
 | `src/receipt-formatters.ts` | CSV and plain-text formatting (RFC 4180 compliant)                                            |
 | `src/vat-calculator.ts`     | Auto-recalculates VAT amount and subtotal when rate or total changes                          |
 | `src/pwa-install.ts`        | Deferred PWA install prompt handling                                                          |
@@ -91,9 +92,13 @@ tested via integration/e2e if that becomes worthwhile.
 Always run both before committing or pushing — the CI runs both and will fail if either does:
 
 ```bash
-npm test        # all 5 test suites must pass
+npm test        # all 6 test suites must pass
 npm run build   # tsc type-check + Vite build must succeed
 ```
+
+After any functional change, consider whether unit tests need adding, updating,
+or removing. Tests live in `tests/` and mirror source file names
+(e.g. `src/export-actions.ts` → `tests/export-actions.test.ts`).
 
 ## Deployment
 
