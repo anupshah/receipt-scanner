@@ -50,6 +50,7 @@ function buildDom(): void {
       </table>
       <menu id="history-popover-actions" hidden>
         <li><button id="popover-download-btn" type="button">Download CSV</button></li>
+        <li><button id="popover-copy-btn" type="button">Copy CSV</button></li>
         <li><button id="popover-clear-btn" type="button">Clear all</button></li>
       </menu>
     </div>
@@ -267,6 +268,31 @@ describe('export-actions', () => {
     it('download button does nothing when no receipts saved', () => {
       click('popover-download-btn')
       expect(mockDownloadCSV).not.toHaveBeenCalled()
+    })
+
+    it('copy button copies CSV to clipboard', async () => {
+      const writeText = vi.fn().mockResolvedValue(undefined)
+      Object.assign(navigator, { clipboard: { writeText } })
+
+      click('save-btn')
+      vi.clearAllMocks()
+
+      click('popover-copy-btn')
+      await vi.waitFor(() => {
+        expect(writeText).toHaveBeenCalledWith('csv-content')
+        expect(mockShowToast).toHaveBeenCalledWith(
+          'CSV copied to clipboard',
+          'success',
+        )
+      })
+    })
+
+    it('copy button does nothing when no receipts saved', () => {
+      const writeText = vi.fn().mockResolvedValue(undefined)
+      Object.assign(navigator, { clipboard: { writeText } })
+
+      click('popover-copy-btn')
+      expect(writeText).not.toHaveBeenCalled()
     })
 
     it('clear button resets everything', () => {

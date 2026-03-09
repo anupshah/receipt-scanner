@@ -120,7 +120,7 @@
     position-area: bottom span-left;
     margin: 0;
     margin-top: var(--sp-2);
-    width: min(280px, 90vw);
+    width: min(340px, 90vw);
     padding: var(--sp-4);
     background: var(--surface-card);
     border: 1px solid var(--border);
@@ -215,6 +215,8 @@
 
   .history-popover__actions {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
     gap: var(--sp-2);
     list-style: none;
     padding: 0;

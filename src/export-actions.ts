@@ -160,6 +160,20 @@ export function wireExportActions(): void {
     }
   });
 
+  // Popover: copy CSV to clipboard
+  document.getElementById('popover-copy-btn')?.addEventListener('click', async () => {
+    if (receiptHistory.length > 0) {
+      const csv = buildCSV(receiptHistory);
+      try {
+        await copyToClipboard(csv);
+        showToast('CSV copied to clipboard', 'success');
+      } catch {
+        showToast('Copy failed — try the download button', 'error');
+      }
+      (document.getElementById('history-popover') as HTMLElement)?.hidePopover();
+    }
+  });
+
   // Popover: clear saved receipts
   document.getElementById('popover-clear-btn')?.addEventListener('click', () => {
     receiptHistory = [];
