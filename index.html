@@ -1,419 +1,271 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Scan UK business receipts, extract VAT and totals, export to CSV — all in your browser, no data leaves your device." />
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f0eb" />
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e0e14" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Scan UK business receipts, extract VAT and totals, export to CSV — all in your browser, no data leaves your device." />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f0eb" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e0e14" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Receipt Scanner" />
-  <meta property="og:description" content="UK receipt OCR — VAT extraction, CSV export. Runs entirely in your browser." />
-  <meta property="og:type" content="website" />
+    <!-- Open Graph -->
+    <meta property="og:title" content="Receipt Scanner" />
+    <meta property="og:description" content="UK receipt OCR — VAT extraction, CSV export. Runs entirely in your browser." />
+    <meta property="og:type" content="website" />
 
-  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
-  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
 
-  <title>Receipt Scanner</title>
-  <link rel="stylesheet" href="/src/css/index.css" />
-</head>
+    <title>Receipt Scanner</title>
+    <link rel="stylesheet" href="/src/css/index.css" />
+  </head>
 
-<body>
+  <body>
+    <!-- ── Skip link ─────────────────────────────────────────── -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- ── Skip link ─────────────────────────────────────────── -->
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-
-  <!-- ── App shell ─────────────────────────────────────────── -->
-  <div class="app-shell">
-
-    <header class="app-header" role="banner">
-      <div class="app-header__inner">
-        <h1 class="app-title"><span class="app-logo" aria-hidden="true">🧾</span> Receipt Scanner</h1>
-        <span class="app-subtitle">UK VAT · No data leaves your device</span>
-      </div>
-      <div class="app-header__actions">
-        <button
-          id="install-btn"
-          class="btn btn--ghost btn--small"
-          hidden
-          aria-label="Install app to your device"
-        >
-          ⬇ Install
-        </button>
-        <button
-          class="history-pill"
-          id="history-count"
-          popovertarget="history-popover"
-          aria-label="0 receipts saved"
-        >
-          <span class="history-pill__icon" aria-hidden="true">🧾</span>
-          <span class="history-pill__count">0</span>
-        </button>
-      </div>
-
-      <!-- ── History popover dropdown ──────────────────────── -->
-      <div id="history-popover" class="history-popover" popover="auto">
-        <p class="history-popover__status" id="history-popover-status">
-          No receipts saved yet.
-        </p>
-        <p class="history-popover__hint" id="history-popover-hint">
-          Scan a receipt, review the fields, then hit <strong>Save Receipt</strong> to queue it here.
-          When you're done, download everything as a single CSV.
-        </p>
-        <table class="history-popover__table" id="history-popover-table" hidden aria-label="Saved receipts summary">
-          <thead>
-            <tr>
-              <th scope="col">Vendor</th>
-              <th scope="col" class="history-popover__amount text-end">Total</th>
-            </tr>
-          </thead>
-          <tbody id="history-popover-tbody"></tbody>
-          <tfoot id="history-popover-tfoot">
-            <tr>
-              <th scope="row">Total</th>
-              <td class="history-popover__amount text-end" id="history-popover-total"></td>
-            </tr>
-          </tfoot>
-        </table>
-        <menu class="history-popover__actions" id="history-popover-actions" hidden>
-          <li>
-            <button id="popover-download-btn" class="btn btn--primary btn--small" type="button">
-              Download CSV
-            </button>
-          </li>
-          <li>
-            <button id="popover-copy-btn" class="btn btn--secondary btn--small" type="button">
-              Copy CSV
-            </button>
-          </li>
-          <li>
-            <button id="popover-clear-btn" class="btn btn--ghost btn--small" type="button">
-              Clear all
-            </button>
-          </li>
-        </menu>
-      </div>
-    </header>
-
-    <main id="main-content" class="app-main">
-
-      <!-- ── Upload zone ──────────────────────────────────── -->
-      <section
-        id="dropzone"
-        class="dropzone"
-        aria-label="Receipt upload area"
-        role="button"
-        tabindex="0"
-        aria-describedby="dropzone-hint"
-      >
-        <div class="dropzone__icon" aria-hidden="true">
-          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- Receipt body with serrated bottom -->
-            <path d="M14 2H50V53L47 58L44 53L41 58L38 53L35 58L32 53L29 58L26 53L23 58L20 53L17 58L14 53Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
-            <!-- Item lines -->
-            <line x1="20" y1="14" x2="44" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <line x1="20" y1="22" x2="44" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <line x1="20" y1="30" x2="36" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <!-- Total line -->
-            <line x1="20" y1="41" x2="44" y2="41" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
+    <!-- ── App shell ─────────────────────────────────────────── -->
+    <div class="app-shell">
+      <header class="app-header" role="banner">
+        <div class="app-header__inner">
+          <h1 class="app-title"><span class="app-logo" aria-hidden="true">🧾</span> Receipt Scanner</h1>
+          <span class="app-subtitle">UK VAT · No data leaves your device</span>
         </div>
-
-        <p class="dropzone__lead">Drop a receipt here</p>
-        <p id="dropzone-hint" class="dropzone__hint">
-          JPG, PNG, HEIC or PDF (page 1) · or tap to use camera
-        </p>
-
-        <button
-          id="scan-btn"
-          class="btn btn--primary"
-          type="button"
-          aria-controls="results-section"
-        >
-          <span aria-hidden="true">📷</span> Scan Receipt
-        </button>
-
-        <!-- Hidden file input — accepts camera on mobile -->
-        <input
-          id="file-input"
-          type="file"
-          accept="image/*,application/pdf,.pdf"
-          capture="environment"
-          aria-hidden="true"
-          tabindex="-1"
-          style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px"
-        />
-      </section>
-
-      <!-- ── How to use ───────────────────────────────────── -->
-      <details class="examples-details">
-        <summary class="examples-summary">how to use</summary>
-        <ol class="howto-list">
-          <li><strong>Scan</strong> — drop a receipt, click "Scan Receipt", or try an example below.</li>
-          <li><strong>Review</strong> — check the extracted fields and correct anything the scanner missed.</li>
-          <li><strong>Save</strong> — click "Save Receipt" to queue it. The 🧾 counter top-right tracks your total.</li>
-          <li><strong>Repeat</strong> — scan your next receipt; each save adds to the queue.</li>
-          <li><strong>Export</strong> — tap the 🧾 counter or the "Download CSV" button to export all saved receipts at once.</li>
-        </ol>
-      </details>
-
-      <!-- ── Sample receipts ─────────────────────────────── -->
-      <details id="examples-details" class="examples-details">
-        <summary class="examples-summary">try an example</summary>
-        <section class="examples-section" aria-label="Sample receipts">
-          <p class="examples-desc">
-            Click a sample receipt below to scan it, or drag it into the drop zone above.
-          </p>
-          <div class="examples-grid">
-          <button
-            class="example-card"
-            type="button"
-            draggable="true"
-            data-src="./examples/office-receipt.jpg"
-            data-name="office-receipt.jpg"
-            data-type="image/jpeg"
-            aria-label="Try office equipment receipt (image)"
-          >
-            <span class="example-card__icon" aria-hidden="true">📄</span>
-            <span class="example-card__label">Office Equipment</span>
-            <span class="example-card__meta">Image · VAT receipt</span>
-          </button>
-          <button
-            class="example-card"
-            type="button"
-            draggable="true"
-            data-src="./examples/fuel-receipt.jpg"
-            data-name="fuel-receipt.jpg"
-            data-type="image/jpeg"
-            aria-label="Try EV charging receipt (image)"
-          >
-            <span class="example-card__icon" aria-hidden="true">⚡</span>
-            <span class="example-card__label">EV Charging</span>
-            <span class="example-card__meta">Image · fuel receipt</span>
-          </button>
-          <button
-            class="example-card"
-            type="button"
-            draggable="true"
-            data-src="./examples/invoice-example.pdf"
-            data-name="invoice-example.pdf"
-            data-type="application/pdf"
-            aria-label="Try machine-generated tax invoice (PDF)"
-          >
-            <span class="example-card__icon" aria-hidden="true">🧾</span>
-            <span class="example-card__label">Tax Invoice</span>
-            <span class="example-card__meta">PDF · machine-generated</span>
-          </button>
-          </div>
-        </section>
-      </details>
-
-      <!-- ── OCR status ──────────────────────────────────── -->
-      <div id="ocr-status" class="ocr-status" role="status" aria-live="polite" hidden>
-        <p id="ocr-status-text" class="ocr-status__text">Loading…</p>
-        <progress
-          id="ocr-progress"
-          class="ocr-progress"
-          aria-label="OCR progress"
-        ></progress>
-      </div>
-
-      <!-- ── Image preview ───────────────────────────────── -->
-      <section id="preview-section" class="preview-section" hidden aria-hidden="true" aria-label="Receipt image preview">
-        <img id="receipt-preview" class="receipt-preview" alt="" />
-      </section>
-
-      <!-- ── Results ─────────────────────────────────────── -->
-      <section
-        id="results-section"
-        class="results-section"
-        hidden
-        aria-hidden="true"
-        aria-label="Extracted receipt data"
-      >
-        <header class="results-header">
-          <h2 class="results-title">Extracted Data</h2>
-          <p class="results-hint">Review and correct the fields below before exporting.</p>
-        </header>
-
-        <form
-          id="receipt-form"
-          class="receipt-form"
-          novalidate
-          aria-label="Receipt fields"
-          onsubmit="return false"
-        >
-          <!-- Vendor -->
-          <div class="field-group">
-            <label class="field-label" for="field-vendor">
-              Vendor
-              <span class="confidence-badge" data-badge="vendor" aria-hidden="true"></span>
-            </label>
-            <input
-              id="field-vendor"
-              class="field-input"
-              type="text"
-              autocomplete="organization"
-              placeholder="Business name"
-              aria-describedby="vendor-hint"
-            />
-            <p id="vendor-hint" class="field-hint">Supplier or merchant name</p>
-          </div>
-
-          <!-- Date -->
-          <div class="field-group">
-            <label class="field-label" for="field-date">
-              Date
-              <span class="confidence-badge" data-badge="date" aria-hidden="true"></span>
-            </label>
-            <input
-              id="field-date"
-              class="field-input"
-              type="date"
-              aria-describedby="date-hint"
-            />
-            <p id="date-hint" class="field-hint">Date on the receipt</p>
-          </div>
-
-          <!-- Category -->
-          <div class="field-group">
-            <label class="field-label" for="field-category">Category</label>
-            <select id="field-category" class="field-select">
-              <!-- Populated by JS -->
-            </select>
-          </div>
-
-          <!-- Total -->
-          <div class="field-group">
-            <label class="field-label" for="field-total">
-              Total (£, inc. VAT)
-              <span class="confidence-badge" data-badge="total" aria-hidden="true"></span>
-            </label>
-            <div class="field-input-prefix">
-              <span class="field-prefix" aria-hidden="true">£</span>
-              <input
-                id="field-total"
-                class="field-input field-input--number"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                aria-describedby="total-hint"
-              />
-            </div>
-            <p id="total-hint" class="field-hint">Amount paid including VAT</p>
-          </div>
-
-          <!-- VAT Rate -->
-          <div class="field-group">
-            <label class="field-label" for="field-vat-rate">VAT Rate</label>
-            <select id="field-vat-rate" class="field-select" aria-describedby="vat-rate-hint">
-              <!-- Populated by JS -->
-            </select>
-            <p id="vat-rate-hint" class="field-hint">Standard UK rate is 20%</p>
-          </div>
-
-          <!-- VAT Amount -->
-          <div class="field-group">
-            <label class="field-label" for="field-vat-amount">
-              VAT Amount (£)
-              <span class="confidence-badge" data-badge="vat-amount" aria-hidden="true"></span>
-            </label>
-            <div class="field-input-prefix">
-              <span class="field-prefix" aria-hidden="true">£</span>
-              <input
-                id="field-vat-amount"
-                class="field-input field-input--number"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                aria-describedby="vat-amount-hint"
-              />
-            </div>
-            <p id="vat-amount-hint" class="field-hint">Auto-calculated from total + rate</p>
-          </div>
-
-          <!-- Subtotal -->
-          <div class="field-group">
-            <label class="field-label" for="field-subtotal">Subtotal (£, ex. VAT)</label>
-            <div class="field-input-prefix">
-              <span class="field-prefix" aria-hidden="true">£</span>
-              <input
-                id="field-subtotal"
-                class="field-input field-input--number"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-              />
-            </div>
-          </div>
-
-          <!-- VAT Number -->
-          <div class="field-group field-group--full">
-            <label class="field-label" for="field-vat-number">Supplier VAT Number</label>
-            <input
-              id="field-vat-number"
-              class="field-input"
-              type="text"
-              placeholder="GB123456789"
-              pattern="(GB)?\d{9}"
-              aria-describedby="vat-number-hint"
-            />
-            <p id="vat-number-hint" class="field-hint">9-digit VAT registration number</p>
-          </div>
-
-        </form>
-
-        <!-- ── Actions ──────────────────────────────────── -->
-        <div class="results-actions" role="group" aria-label="Export options">
-          <button id="save-btn" class="btn btn--primary" type="button">
-            <span aria-hidden="true">💾</span> Save Receipt
-          </button>
-          <button id="copy-csv-btn" class="btn btn--secondary" type="button">
-            <span aria-hidden="true">📋</span> Copy CSV
-          </button>
-          <button id="copy-text-btn" class="btn btn--secondary" type="button">
-            <span aria-hidden="true">📄</span> Copy Text
-          </button>
-          <button id="download-csv-btn" class="btn btn--secondary" type="button">
-            <span aria-hidden="true">⬇</span> Download CSV
+        <div class="app-header__actions">
+          <button id="install-btn" class="btn btn--ghost btn--small" hidden aria-label="Install app to your device">⬇ Install</button>
+          <button class="history-pill" id="history-count" popovertarget="history-popover" aria-label="0 receipts saved">
+            <span class="history-pill__icon" aria-hidden="true">🧾</span>
+            <span class="history-pill__count">0</span>
           </button>
         </div>
 
-        <!-- ── Raw OCR text ──────────────────────────────── -->
-        <div class="raw-text-controls">
-          <button id="raw-toggle-btn" class="btn btn--ghost btn--small" type="button" aria-expanded="false" aria-controls="raw-text-section">
-            Show raw OCR text
-          </button>
+        <!-- ── History popover dropdown ──────────────────────── -->
+        <div id="history-popover" class="history-popover" popover="auto">
+          <p class="history-popover__status" id="history-popover-status">No receipts saved yet.</p>
+          <p class="history-popover__hint" id="history-popover-hint">Scan a receipt, review the fields, then hit <strong>Save Receipt</strong> to queue it here. When you're done, download everything as a single CSV.</p>
+          <table class="history-popover__table" id="history-popover-table" hidden aria-label="Saved receipts summary">
+            <thead>
+              <tr>
+                <th scope="col">Vendor</th>
+                <th scope="col" class="history-popover__amount text-end">Total</th>
+              </tr>
+            </thead>
+            <tbody id="history-popover-tbody"></tbody>
+            <tfoot id="history-popover-tfoot">
+              <tr>
+                <th scope="row">Total</th>
+                <td class="history-popover__amount text-end" id="history-popover-total"></td>
+              </tr>
+            </tfoot>
+          </table>
+          <menu class="history-popover__actions" id="history-popover-actions" hidden>
+            <li>
+              <button id="popover-download-btn" class="btn btn--primary btn--small" type="button">Download CSV</button>
+            </li>
+            <li>
+              <button id="popover-copy-btn" class="btn btn--secondary btn--small" type="button">Copy CSV</button>
+            </li>
+            <li>
+              <button id="popover-clear-btn" class="btn btn--ghost btn--small" type="button">Clear all</button>
+            </li>
+          </menu>
         </div>
+      </header>
 
-        <section id="raw-text-section" class="raw-text-section" hidden aria-hidden="true" aria-label="Raw OCR output">
-          <h3 class="raw-text-title">Raw OCR Output</h3>
-          <pre id="raw-text" class="raw-text" tabindex="0" aria-label="Raw text extracted from receipt"></pre>
+      <main id="main-content" class="app-main">
+        <!-- ── Upload zone ──────────────────────────────────── -->
+        <section id="dropzone" class="dropzone" aria-label="Receipt upload area" role="button" tabindex="0" aria-describedby="dropzone-hint">
+          <div class="dropzone__icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <!-- Receipt body with serrated bottom -->
+              <path d="M14 2H50V53L47 58L44 53L41 58L38 53L35 58L32 53L29 58L26 53L23 58L20 53L17 58L14 53Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
+              <!-- Item lines -->
+              <line x1="20" y1="14" x2="44" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <line x1="20" y1="22" x2="44" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <line x1="20" y1="30" x2="36" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <!-- Total line -->
+              <line x1="20" y1="41" x2="44" y2="41" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+          </div>
+
+          <p class="dropzone__lead">Drop a receipt here</p>
+          <p id="dropzone-hint" class="dropzone__hint">JPG, PNG, HEIC or PDF (page 1) · or tap to use camera</p>
+
+          <button id="scan-btn" class="btn btn--primary" type="button" aria-controls="results-section"><span aria-hidden="true">📷</span> Scan Receipt</button>
+
+          <!-- Hidden file input — accepts camera on mobile -->
+          <input id="file-input" type="file" accept="image/*,application/pdf,.pdf" capture="environment" aria-hidden="true" tabindex="-1" style="position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px" />
         </section>
 
-      </section>
-      <!-- /results-section -->
+        <!-- ── How to use ───────────────────────────────────── -->
+        <details class="examples-details">
+          <summary class="examples-summary">how to use</summary>
+          <ol class="howto-list">
+            <li><strong>Scan</strong> — drop a receipt, click "Scan Receipt", or try an example below.</li>
+            <li><strong>Review</strong> — check the extracted fields and correct anything the scanner missed.</li>
+            <li><strong>Save</strong> — click "Save Receipt" to queue it. The 🧾 counter top-right tracks your total.</li>
+            <li><strong>Repeat</strong> — scan your next receipt; each save adds to the queue.</li>
+            <li><strong>Export</strong> — tap the 🧾 counter or the "Download CSV" button to export all saved receipts at once.</li>
+          </ol>
+        </details>
 
-    </main>
+        <!-- ── Sample receipts ─────────────────────────────── -->
+        <details id="examples-details" class="examples-details">
+          <summary class="examples-summary">try an example</summary>
+          <section class="examples-section" aria-label="Sample receipts">
+            <p class="examples-desc">Click a sample receipt below to scan it, or drag it into the drop zone above.</p>
+            <div class="examples-grid">
+              <button class="example-card" type="button" draggable="true" data-src="./examples/office-receipt.jpg" data-name="office-receipt.jpg" data-type="image/jpeg" aria-label="Try office equipment receipt (image)">
+                <span class="example-card__icon" aria-hidden="true">📄</span>
+                <span class="example-card__label">Office Equipment</span>
+                <span class="example-card__meta">Image · VAT receipt</span>
+              </button>
+              <button class="example-card" type="button" draggable="true" data-src="./examples/fuel-receipt.jpg" data-name="fuel-receipt.jpg" data-type="image/jpeg" aria-label="Try EV charging receipt (image)">
+                <span class="example-card__icon" aria-hidden="true">⚡</span>
+                <span class="example-card__label">EV Charging</span>
+                <span class="example-card__meta">Image · fuel receipt</span>
+              </button>
+              <button class="example-card" type="button" draggable="true" data-src="./examples/invoice-example.pdf" data-name="invoice-example.pdf" data-type="application/pdf" aria-label="Try machine-generated tax invoice (PDF)">
+                <span class="example-card__icon" aria-hidden="true">🧾</span>
+                <span class="example-card__label">Tax Invoice</span>
+                <span class="example-card__meta">PDF · machine-generated</span>
+              </button>
+            </div>
+          </section>
+        </details>
 
-    <footer class="app-footer" role="contentinfo">
-      <p>All processing happens <strong>in your browser</strong>. No images or data are uploaded anywhere.</p>
-      <p class="app-footer__disclaimer">
-        Use at your own risk. Always verify extracted data before use.
-        Not a substitute for professional accounting advice.
-        <a href="https://github.com/your-username/receipt-scanner/blob/main/LICENSE.txt" rel="noopener">MIT licence</a>.
-      </p>
-    </footer>
+        <!-- ── OCR status ──────────────────────────────────── -->
+        <div id="ocr-status" class="ocr-status" role="status" aria-live="polite" hidden>
+          <p id="ocr-status-text" class="ocr-status__text">Loading…</p>
+          <progress id="ocr-progress" class="ocr-progress" aria-label="OCR progress"></progress>
+        </div>
 
-  </div><!-- /app-shell -->
+        <!-- ── Image preview ───────────────────────────────── -->
+        <section id="preview-section" class="preview-section" hidden aria-hidden="true" aria-label="Receipt image preview">
+          <img id="receipt-preview" class="receipt-preview" alt="" />
+        </section>
 
-  <!-- ── Toast container ───────────────────────────────────── -->
-  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+        <!-- ── Results ─────────────────────────────────────── -->
+        <section id="results-section" class="results-section" hidden aria-hidden="true" aria-label="Extracted receipt data">
+          <header class="results-header">
+            <h2 class="results-title">Extracted Data</h2>
+            <p class="results-hint">Review and correct the fields below before exporting.</p>
+          </header>
 
-  <script type="module" src="/src/main.ts"></script>
-</body>
+          <form id="receipt-form" class="receipt-form" novalidate aria-label="Receipt fields" onsubmit="return false;">
+            <!-- Vendor -->
+            <div class="field-group">
+              <label class="field-label" for="field-vendor">
+                Vendor
+                <span class="confidence-badge" data-badge="vendor" aria-hidden="true"></span>
+              </label>
+              <input id="field-vendor" class="field-input" type="text" autocomplete="organization" placeholder="Business name" aria-describedby="vendor-hint" />
+              <p id="vendor-hint" class="field-hint">Supplier or merchant name</p>
+            </div>
+
+            <!-- Date -->
+            <div class="field-group">
+              <label class="field-label" for="field-date">
+                Date
+                <span class="confidence-badge" data-badge="date" aria-hidden="true"></span>
+              </label>
+              <input id="field-date" class="field-input" type="date" aria-describedby="date-hint" />
+              <p id="date-hint" class="field-hint">Date on the receipt</p>
+            </div>
+
+            <!-- Category -->
+            <div class="field-group">
+              <label class="field-label" for="field-category">Category</label>
+              <select id="field-category" class="field-select">
+                <!-- Populated by JS -->
+              </select>
+            </div>
+
+            <!-- Total -->
+            <div class="field-group">
+              <label class="field-label" for="field-total">
+                Total (£, inc. VAT)
+                <span class="confidence-badge" data-badge="total" aria-hidden="true"></span>
+              </label>
+              <div class="field-input-prefix">
+                <span class="field-prefix" aria-hidden="true">£</span>
+                <input id="field-total" class="field-input field-input--number" type="number" min="0" step="0.01" placeholder="0.00" aria-describedby="total-hint" />
+              </div>
+              <p id="total-hint" class="field-hint">Amount paid including VAT</p>
+            </div>
+
+            <!-- VAT Rate -->
+            <div class="field-group">
+              <label class="field-label" for="field-vat-rate">VAT Rate</label>
+              <select id="field-vat-rate" class="field-select" aria-describedby="vat-rate-hint">
+                <!-- Populated by JS -->
+              </select>
+              <p id="vat-rate-hint" class="field-hint">Standard UK rate is 20%</p>
+            </div>
+
+            <!-- VAT Amount -->
+            <div class="field-group">
+              <label class="field-label" for="field-vat-amount">
+                VAT Amount (£)
+                <span class="confidence-badge" data-badge="vat-amount" aria-hidden="true"></span>
+              </label>
+              <div class="field-input-prefix">
+                <span class="field-prefix" aria-hidden="true">£</span>
+                <input id="field-vat-amount" class="field-input field-input--number" type="number" min="0" step="0.01" placeholder="0.00" aria-describedby="vat-amount-hint" />
+              </div>
+              <p id="vat-amount-hint" class="field-hint">Auto-calculated from total + rate</p>
+            </div>
+
+            <!-- Subtotal -->
+            <div class="field-group">
+              <label class="field-label" for="field-subtotal">Subtotal (£, ex. VAT)</label>
+              <div class="field-input-prefix">
+                <span class="field-prefix" aria-hidden="true">£</span>
+                <input id="field-subtotal" class="field-input field-input--number" type="number" min="0" step="0.01" placeholder="0.00" />
+              </div>
+            </div>
+
+            <!-- VAT Number -->
+            <div class="field-group field-group--full">
+              <label class="field-label" for="field-vat-number">Supplier VAT Number</label>
+              <input id="field-vat-number" class="field-input" type="text" placeholder="GB123456789" pattern="(GB)?\d{9}" aria-describedby="vat-number-hint" />
+              <p id="vat-number-hint" class="field-hint">9-digit VAT registration number</p>
+            </div>
+          </form>
+
+          <!-- ── Actions ──────────────────────────────────── -->
+          <div class="results-actions" role="group" aria-label="Export options">
+            <button id="save-btn" class="btn btn--primary" type="button"><span aria-hidden="true">💾</span> Save Receipt</button>
+            <button id="copy-csv-btn" class="btn btn--secondary" type="button"><span aria-hidden="true">📋</span> Copy CSV</button>
+            <button id="copy-text-btn" class="btn btn--secondary" type="button"><span aria-hidden="true">📄</span> Copy Text</button>
+            <button id="download-csv-btn" class="btn btn--secondary" type="button"><span aria-hidden="true">⬇</span> Download CSV</button>
+          </div>
+
+          <!-- ── Raw OCR text ──────────────────────────────── -->
+          <div class="raw-text-controls">
+            <button id="raw-toggle-btn" class="btn btn--ghost btn--small" type="button" aria-expanded="false" aria-controls="raw-text-section">Show raw OCR text</button>
+          </div>
+
+          <section id="raw-text-section" class="raw-text-section" hidden aria-hidden="true" aria-label="Raw OCR output">
+            <h3 class="raw-text-title">Raw OCR Output</h3>
+            <pre id="raw-text" class="raw-text" tabindex="0" aria-label="Raw text extracted from receipt"></pre>
+          </section>
+        </section>
+        <!-- /results-section -->
+      </main>
+
+      <footer class="app-footer" role="contentinfo">
+        <p>All processing happens <strong>in your browser</strong>. No images or data are uploaded anywhere.</p>
+        <p class="app-footer__disclaimer">
+          Use at your own risk. Always verify extracted data before use. Not a substitute for professional accounting advice.
+          <a href="https://github.com/anupshah/receipt-scanner/blob/main/LICENSE.txt" target="_blank" rel="noopener">MIT license</a>. <a href="https://github.com/anupshah/receipt-scanner" target="_blank">Source code</a>.
+        </p>
+      </footer>
+    </div>
+    <!-- /app-shell -->
+
+    <!-- ── Toast container ───────────────────────────────────── -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
