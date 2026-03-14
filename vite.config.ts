@@ -1,12 +1,12 @@
-import { defineConfig } from 'vite'
-import { VitePWA } from 'vite-plugin-pwa'
-import mkcert from 'vite-plugin-mkcert'
+import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
+import mkcert from "vite-plugin-mkcert";
 
 export default defineConfig({
-  base: '/receipt-scanner/',
+  base: "/receipt-scanner/",
 
   build: {
-    target: 'es2022',
+    target: "es2022",
   },
 
   // ── HTTPS for local dev via mkcert ──────────────────────────
@@ -22,36 +22,59 @@ export default defineConfig({
     mkcert(),
 
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: "autoUpdate",
       devOptions: { enabled: true },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,jpg,svg,woff2}'],
+        globPatterns: ["**/*.{js,css,html,ico,png,jpg,svg,woff2}"],
         maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /tesseract/,
-            handler: 'CacheFirst',
+            handler: "CacheFirst",
             options: {
-              cacheName: 'tesseract-cache',
+              cacheName: "tesseract-cache",
               expiration: { maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
         ],
       },
       manifest: {
-        name: 'Receipt Scanner',
-        short_name: 'Receipts',
-        description: 'Scan receipts, extract VAT and totals, export to CSV',
-        theme_color: '#279b78',
-        background_color: '#f5f0eb',
-        display: 'standalone',
-        orientation: 'portrait',
-        scope: './',
-        start_url: './',
+        id: "/receipt-scanner/",
+        name: "Receipt Scanner",
+        short_name: "Receipts",
+        description: "Scan receipts, extract VAT and totals, export to CSV",
+        theme_color: "#279b78",
+        background_color: "#f5f0eb",
+        display: "standalone",
+        orientation: "portrait",
+        scope: "./",
+        start_url: "./",
         icons: [
-          { src: './icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: './icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: './icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: "./icons/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "./icons/icon-512.png", sizes: "512x512", type: "image/png" },
+          {
+            src: "./icons/icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
+        ],
+        screenshots: [
+          {
+            src: "./screenshots/mobile.png",
+            sizes: "390x844",
+            type: "image/png",
+            label:
+              "Receipt Scanner on mobile — scan, review, and export receipts",
+          },
+          {
+            src: "./screenshots/desktop.png",
+            sizes: "996x827",
+            type: "image/png",
+            form_factor: "wide",
+            label:
+              "Receipt Scanner on desktop — scan, review, and export receipts",
+          },
         ],
       },
     }),
@@ -59,20 +82,20 @@ export default defineConfig({
 
   // ── Vitest configuration ────────────────────────────────────
   test: {
-    environment: 'jsdom',
+    environment: "jsdom",
     globals: true,
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
+    include: ["src/**/*.test.ts", "tests/**/*.test.ts"],
     server: {
       https: true,
     },
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'html', 'lcov'],
-      include: ['src/**/*.ts'],
-      exclude: ['src/main.ts'],
+      provider: "v8",
+      reporter: ["text", "html", "lcov"],
+      include: ["src/**/*.ts"],
+      exclude: ["src/main.ts"],
     },
     ui: {
       open: true,
     },
   },
-})
+});
