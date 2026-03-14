@@ -10,7 +10,7 @@ See README.md for the full rationale.
 
 ## Tech stack
 
-- **Vite 7** + **TypeScript (strict)** — build tooling
+- **Vite 8** + **TypeScript (strict)** — build tooling
 - **Tesseract.js 6** — in-browser OCR, runs in a Web Worker
 - **vite-plugin-pwa 1.x** — service worker and Web App Manifest generation
 - **vite-plugin-mkcert 1.x** — local HTTPS (required for camera and PWA APIs)
