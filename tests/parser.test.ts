@@ -4,7 +4,7 @@
 // ============================================================
 
 import { describe, it, expect } from 'vitest'
-import { parseReceipt, parsePoundLoose } from '../src/parser'
+import { parseReceipt, parsePoundLoose, isValidUkVat, recoverVatDigits } from '../src/parser'
 
 // ── Helpers ───────────────────────────────────────────────────
 
@@ -259,6 +259,15 @@ describe('VAT extraction', () => {
     expect(data.vatRate).toBe(0.20)
   })
 
+  it('extracts "VAT included in total" format', () => {
+    const { data } = parseReceipt(receipt([
+      'Total: £83.60',
+      'VAT included in total: £12.67',
+      'VAT Reg No: 999999973',
+    ]))
+    expect(data.vatAmount).toBe(12.67)
+  })
+
   it('does not zero-rate when a VAT number is present but a VAT amount is also found', () => {
     // Zero-rated fallback (vatRate = 0) must only fire when vatAmount is null.
     // If vatAmount is successfully extracted, the rate should reflect the real rate.
@@ -272,6 +281,34 @@ describe('VAT extraction', () => {
     expect(data.vatAmount).toBe(20.00)
     expect(data.vatRate).not.toBe(0)
     expect(data.vatRate).toBe(0.20)
+  })
+})
+
+// ── UK VAT checksum ───────────────────────────────────────────
+
+describe('isValidUkVat', () => {
+  it('validates 999999973 (HMRC test number, original Modulus 97 algorithm)', () => {
+    expect(isValidUkVat('999999973')).toBe(true)
+  })
+
+  it('rejects a 10-digit string outright', () => {
+    expect(isValidUkVat('9990999973')).toBe(false)
+  })
+
+  it('rejects an invalid 9-digit number', () => {
+    // 999999970 — check digits changed so checksum fails
+    expect(isValidUkVat('999999970')).toBe(false)
+  })
+})
+
+describe('recoverVatDigits', () => {
+  it('recovers 999999973 from OCR-garbled 9990999973 (extra 0 in middle)', () => {
+    // HMRC test number 999999973 with a spurious '0' inserted at position 3
+    expect(recoverVatDigits('9990999973')).toBe('999999973')
+  })
+
+  it('returns null when no valid candidate found', () => {
+    expect(recoverVatDigits('9999999700')).toBeNull()
   })
 })
 
@@ -296,6 +333,12 @@ describe('VAT number extraction', () => {
   it('returns null when no VAT number present', () => {
     const { data } = parseReceipt(receipt(['Total: £10.00']))
     expect(data.vatNumber).toBeNull()
+  })
+
+  it('recovers a 10-digit OCR-garbled VAT number (extra digit in middle)', () => {
+    // HMRC test number 999999973 with a spurious '0' inserted at position 3
+    const { data } = parseReceipt(receipt(['VAT Reg No: 9990999973']))
+    expect(data.vatNumber).toBe('999999973')
   })
 })
 

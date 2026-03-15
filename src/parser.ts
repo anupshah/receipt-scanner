@@ -16,6 +16,36 @@ export interface ParseResult {
   confidence: ParseConfidence;
 }
 
+// ── UK VAT number checksum ────────────────────────────────────
+
+/**
+ * Validates a 9-digit UK VAT number against the HMRC Modulus 97 check.
+ * Two variants are tried: the original algorithm and the post-2010 variant
+ * (which adds 55 before applying Modulus 97).
+ */
+export function isValidUkVat(digits: string): boolean {
+  if (!/^\d{9}$/.test(digits)) return false;
+  const d = digits.split('').map(Number);
+  const weights = [8, 7, 6, 5, 4, 3, 2];
+  const sum = d.slice(0, 7).reduce((acc, n, i) => acc + n * weights[i], 0);
+  const checkValue = d[7] * 10 + d[8];
+  const passes = (s: number) => { let r = s; while (r > 0) r -= 97; return Math.abs(r) === checkValue; };
+  return passes(sum) || passes(sum + 55);
+}
+
+/**
+ * When OCR inserts a spurious digit into a VAT number, try removing each
+ * digit in turn and return the first 9-digit candidate that passes the
+ * UK VAT checksum. Returns null if no valid candidate is found.
+ */
+export function recoverVatDigits(digits: string): string | null {
+  for (let i = 0; i < digits.length; i++) {
+    const candidate = digits.slice(0, i) + digits.slice(i + 1);
+    if (isValidUkVat(candidate)) return candidate;
+  }
+  return null;
+}
+
 // ── Currency helpers ─────────────────────────────────────────
 
 /**
@@ -154,11 +184,12 @@ const VAT_LINE_PATTERNS = [
   /^[ \t]*20%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
   // Same layout for reduced 5% rate: "5%  £48.00  £2.40"
   /^[ \t]*5%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
+  /\bvat\s+included\s+in\s+(?:total|price)[\s:£]+([0-9,]+(?:\.[0-9]+|[ ][0-9]{2})?)\b/i,
   /\bvat[\s:£]+([0-9,]+\.[0-9]{1,2})\b/i,   // require decimal on the generic fallback to avoid matching VAT reg numbers
   /\btax[\s:£]+([0-9,]+\.[0-9]{1,2})\b/i,
 ];
 
-const VAT_NUMBER_RE = /\bvat\s*(?:reg(?:istration)?\s*(?:no\.?|number)?|no\.?|number)?[\s:#]*((?:GB)?\d{9})\b/i;
+const VAT_NUMBER_RE = /\bvat\s*(?:reg(?:istration)?\s*(?:no\.?|number)?|no\.?|number)?[\s:#]*((?:GB)?\d{9,11})\b/i;
 
 function extractTotals(text: string): {
   total: number | null;
@@ -232,7 +263,13 @@ function extractTotals(text: string): {
 
 function extractVatNumber(text: string): string | null {
   const m = text.match(VAT_NUMBER_RE);
-  return m?.[1] ?? null;
+  if (!m?.[1]) return null;
+  const raw = m[1];
+  const prefix = /^GB/i.test(raw) ? 'GB' : '';
+  const digits = raw.replace(/^GB/i, '');
+  if (digits.length === 9) return raw;
+  const recovered = recoverVatDigits(digits);
+  return recovered !== null ? prefix + recovered : raw;
 }
 
 // ── Category inference ────────────────────────────────────────
