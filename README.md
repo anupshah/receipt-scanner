@@ -1,5 +1,11 @@
 # Receipt Scanner
 
+**Try it: [https://anupshah.github.io/receipt-scanner](https://anupshah.github.io/receipt-scanner/)**
+
+| Desktop                                         | Mobile                                        |
+| ----------------------------------------------- | --------------------------------------------- |
+| ![Desktop view](public/screenshots/desktop.png) | ![Mobile view](public/screenshots/mobile.png) |
+
 A progressive web app for scanning UK business receipts, extracting VAT and totals, and exporting to CSV. Runs entirely in your browser — no images or data leave your device.
 
 ## Why this exists
@@ -46,17 +52,6 @@ npm run preview     # preview the built output locally
 npm run typecheck   # type check without building
 ```
 
-## Deploying to GitHub Pages
-
-1. Push to a GitHub repository
-2. Go to **Settings → Pages** and set source to **GitHub Actions**
-3. The included `.github/workflows/deploy.yml` handles everything on push to `main`
-4. Set the `base` in `vite.config.ts` to your repo name:
-
-   ```ts
-   base: "/your-repo-name/";
-   ```
-
 ## Project Structure
 
 ```text
@@ -71,6 +66,17 @@ src/
 index.html
 vite.config.ts
 ```
+
+## Deploying your own fork to GitHub Pages
+
+1. Push to a GitHub repository
+2. Go to **Settings → Pages** and set source to **GitHub Actions**
+3. The included `.github/workflows/deploy.yml` handles everything on push to `main`
+4. Set the `base` in `vite.config.ts` to your repo name:
+
+   ```ts
+   base: "/your-repo-name/";
+   ```
 
 ## Parser notes
 
@@ -108,7 +114,7 @@ Not yet implemented. When added it will require:
 
 This tool is a receipt capture aid, not accounting software. HMRC do not mandate specific software for day-to-day record-keeping at the sole trader level — they require that records be accurate and complete. This tool can legitimately form part of that process (scan → verify → export to spreadsheet), but it does not file anything and is not a substitute for professional advice.
 
-Making Tax Digital (MTD) for Income Tax will require compatible software for *submissions* when it applies to you — this tool does not cover that and is not MTD-compatible.
+Making Tax Digital (MTD) for Income Tax will require compatible software for _submissions_ when it applies to you — this tool does not cover that and is not MTD-compatible.
 
 - OCR extraction is imperfect. Always verify every field before using extracted data for any financial, tax, or business purpose.
 - The authors accept no liability for errors in extracted data, missed receipts, incorrect VAT figures, or any financial loss arising from use of this tool.
