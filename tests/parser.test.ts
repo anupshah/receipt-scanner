@@ -192,6 +192,38 @@ describe('VAT extraction', () => {
     expect(data.vatRate).toBe(0.20)
   })
 
+  it('extracts VAT @ 20% with space before percent sign (OCR artefact)', () => {
+    const { data } = parseReceipt(receipt([
+      'subtotal (ex. VAT): £14.20',
+      'VAT @ 20 %: £2.84',
+      'TOTAL: £17.04',
+    ]))
+    expect(data.vatAmount).toBe(2.84)
+    expect(data.vatRate).toBe(0.20)
+    expect(data.total).toBe(17.04)
+  })
+
+  it('extracts VAT when % is misread as 8 by OCR (e.g. "VAT @ 208")', () => {
+    const { data } = parseReceipt(receipt([
+      'subtotal (ex. VAT): £14.20',
+      'VAT @ 208 £2.84',
+      'TOTAL: £17.04',
+    ]))
+    expect(data.vatAmount).toBe(2.84)
+    expect(data.vatRate).toBe(0.20)
+    expect(data.total).toBe(17.04)
+  })
+
+  it('extracts VAT amount on next line from rate label (OCR line-wrap)', () => {
+    const { data } = parseReceipt(receipt([
+      'VAT @ 20%:',
+      '£2.84',
+      'TOTAL: £17.04',
+    ]))
+    expect(data.vatAmount).toBe(2.84)
+    expect(data.vatRate).toBe(0.20)
+  })
+
   it('extracts explicit VAT @ 5%', () => {
     const { data } = parseReceipt(receipt([
       'VAT @ 5% £2.50',

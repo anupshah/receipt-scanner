@@ -171,19 +171,28 @@ const TOTAL_LINE_PATTERNS = [
   new RegExp(String.raw`balance\s+due[^0-9\n]*` + AMT, 'i'),
 ];
 
+// OCR-tolerant rate matching:
+//   20\s*[%§8]  → allows "20%", "20 %", "20§", or "208" (% misread as 8
+//                 is common when sharpening makes the thin % strokes
+//                 look like a closed 8)
+// Amount separator allows one optional line break — Tesseract may wrap the
+// amount onto the next line when there is wide whitespace on the receipt.
+const PCT20 = String.raw`20\s*[%§8]`;
+const PCT5  = String.raw`5\s*[%§8]`;
+const SEP   = String.raw`[^0-9\n]*(?:\n[\s£€]*)?`;  // same-line or next-line amount
+
 const VAT_LINE_PATTERNS = [
-  // [^0-9%\n]* between "vat" and "20%" tolerates OCR substitutions like € for @
-  // AMT reused here so space-as-decimal is handled for VAT amounts too.
-  new RegExp(String.raw`\bvat\b[^0-9%\n]*20%[^0-9\n]*` + AMT, 'i'),
-  new RegExp(String.raw`\bvat\b[^0-9%\n]*5%[^0-9\n]*` + AMT, 'i'),
-  new RegExp(String.raw`\btax\b[^0-9%\n]*20%[^0-9\n]*` + AMT, 'i'),
+  // "VAT @ 20%: £2.84" — explicit rate on same or next line
+  new RegExp(String.raw`\bvat\b[^0-9%\n]*${PCT20}${SEP}` + AMT, 'i'),
+  new RegExp(String.raw`\bvat\b[^0-9%\n]*${PCT5}${SEP}` + AMT, 'i'),
+  new RegExp(String.raw`\btax\b[^0-9%\n]*${PCT20}${SEP}` + AMT, 'i'),
   // Tabular VAT summary row — line starts with the rate ("20%") followed by two
   // amounts: the subtotal excl. VAT, then the VAT amount.  The non-capturing
   // group skips the first amount and the second is captured.
   // Example: "20%  £12.04  £2.40"  (Amazon-style invoice VAT table)
-  /^[ \t]*20%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
+  /^[ \t]*20\s*%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
   // Same layout for reduced 5% rate: "5%  £48.00  £2.40"
-  /^[ \t]*5%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
+  /^[ \t]*5\s*%[^0-9\n]+(?:[0-9,]+\.[0-9]{1,2})[^0-9\n]+([0-9,]+\.[0-9]{1,2})/im,
   /\bvat\s+included\s+in\s+(?:total|price)[\s:£]+([0-9,]+(?:\.[0-9]+|[ ][0-9]{2})?)\b/i,
   /\bvat[\s:£]+([0-9,]+\.[0-9]{1,2})\b/i,   // require decimal on the generic fallback to avoid matching VAT reg numbers
   /\btax[\s:£]+([0-9,]+\.[0-9]{1,2})\b/i,
